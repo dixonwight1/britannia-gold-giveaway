@@ -215,10 +215,30 @@
             '<span style="font-size:14px;line-height:1">&times;</span> Close' +
           '</button>' +
         '</div>' +
-        '<iframe class="fo-frame" src="' + FORM_URL + '" title="Enter the Britannia Gold Giveaway" allow="clipboard-write"></iframe>';
+        '<div class="fo-body">' +
+          '<div class="fo-loader">' +
+            '<span class="fo-loader-mark"></span>' +
+            '<span class="fo-loader-label">Loading entry form…</span>' +
+          '</div>' +
+          '<iframe class="fo-frame" src="' + FORM_URL + '" title="Enter the Britannia Gold Giveaway" allow="clipboard-write"></iframe>' +
+        '</div>';
 
       document.body.appendChild(overlay);
       document.body.classList.add('overlay-open');
+
+      // Reveal the iframe once it has finished loading; fall back to a timer
+      // in case the load event never fires (cross-origin quirks).
+      var frame  = overlay.querySelector('.fo-frame');
+      var loader = overlay.querySelector('.fo-loader');
+      var revealed = false;
+      function reveal(){
+        if(revealed) return; revealed = true;
+        frame.classList.add('ready');
+        loader.classList.add('hide');
+        setTimeout(function(){ if(loader && loader.parentNode) loader.parentNode.removeChild(loader); }, 400);
+      }
+      frame.addEventListener('load', reveal);
+      setTimeout(reveal, 4500); // safety fallback
 
       overlay.querySelectorAll('[data-close]').forEach(function(b){
         b.addEventListener('click', closeOverlay);
