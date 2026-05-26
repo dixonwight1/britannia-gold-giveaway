@@ -195,12 +195,60 @@
 </main>
 
 <script>
-  var FORM_URL = 'https://woobox.com/uxaxvy';
-  document.querySelectorAll('#cta-top, .nav .cta, #cta-form').forEach(function(el){
-    el.setAttribute('href', FORM_URL);
-    el.setAttribute('target', '_blank');
-    el.setAttribute('rel', 'noopener');
-  });
+  (function(){
+    var FORM_URL = 'https://woobox.com/uxaxvy';
+    var triggers = document.querySelectorAll('#cta-top, .nav .cta, #cta-form');
+
+    function openOverlay(e){
+      if(e) e.preventDefault();
+      if(document.getElementById('form-overlay')) return;
+
+      var overlay = document.createElement('div');
+      overlay.id = 'form-overlay';
+      overlay.innerHTML =
+        '<div class="fo-hdr">' +
+          '<a class="brand" href="#" data-close>' +
+            '<span class="brand-mark"></span>' +
+            '<span class="brand-text">World <span>Gold</span> Council</span>' +
+          '</a>' +
+          '<button class="fo-close" type="button" data-close aria-label="Close form">' +
+            '<span style="font-size:14px;line-height:1">&times;</span> Close' +
+          '</button>' +
+        '</div>' +
+        '<iframe class="fo-frame" src="' + FORM_URL + '" title="Enter the Britannia Gold Giveaway" allow="clipboard-write"></iframe>';
+
+      document.body.appendChild(overlay);
+      document.body.classList.add('overlay-open');
+
+      overlay.querySelectorAll('[data-close]').forEach(function(b){
+        b.addEventListener('click', closeOverlay);
+      });
+      document.addEventListener('keydown', escHandler);
+    }
+
+    function closeOverlay(e){
+      if(e) e.preventDefault();
+      var overlay = document.getElementById('form-overlay');
+      if(!overlay) return;
+      overlay.classList.add('closing');
+      document.removeEventListener('keydown', escHandler);
+      setTimeout(function(){
+        overlay.remove();
+        document.body.classList.remove('overlay-open');
+      }, 240);
+    }
+
+    function escHandler(ev){
+      if(ev.key === 'Escape') closeOverlay();
+    }
+
+    triggers.forEach(function(el){
+      el.setAttribute('href', FORM_URL);   // graceful fallback if JS fails
+      el.removeAttribute('target');
+      el.removeAttribute('rel');
+      el.addEventListener('click', openOverlay);
+    });
+  })();
 </script>
 
 </body>
